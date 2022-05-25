@@ -23,12 +23,15 @@ jobs:
           python-version: '3.9'
 
       - name: Create and start virtual environment
+        env:
+          DJANGOKEY: ${{ secrets.DJANGO_SECRETKEY }}
+          OWMKEY: ${{ secrets.OWM_APIKEY }}
         run: |
           python -m venv venv
           source venv/bin/activate
       
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+    #  - name: Install dependencies
+    #    run: pip install -r requirements.txt
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
       
@@ -61,3 +64,5 @@ jobs:
           app-name: 'trailweather'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_D5B73B282B414844A91231978B0CCF5B }}
+          DJANGOKEY: ${{ secrets.DJANGO_SECRETKEY }}
+          OWMKEY: ${{ secrets.OWM_APIKEY }}
