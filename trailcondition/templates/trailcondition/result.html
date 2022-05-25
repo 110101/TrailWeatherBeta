@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	  <link rel="stylesheet" type="text/css" href="{% static 'trailcondition/css/jquery-ui.css' %}"/>
+	  <link rel="stylesheet" type="text/css" href="{% static 'trailcondition/css/style.css' %}" />
+	  <link rel="stylesheet" type="text/css" href="{% static 'trailcondition/leaflet/leaflet.css' %}"/>
+    <title>Trial Kondico - Result</title>
+</head>
+<body>
+  <div id="cookiebanner">
+    <div class="cookiecontent">
+      <div class="cookietext">
+        <span>By accepting the cookie policy you agree to the useage of cookies on this website. This website uses Google Analytics.</span>
+        <a href="/about/#cookiepolicy">more information</a>
+      </div>
+      <div class="cookiebuttons">
+        <div class="btnlink">
+          <a onclick="dislikecookies()">decline</a>
+        </div>
+        <button onclick="iwantcookies()" class="btncookie">accept</button>
+      </div>
+    </div>
+  </div>
+<div class="maincontainer">
+    <div class="container1 media_height1" id="postop">
+        <div id="nav">
+            <div class="navcontainer">
+            <div class="logocontainer">
+                    <div class="logo_img media_vis"></div>
+                    <div class="logo_center">
+                        <a class="logo_text" href="{% url 'trailcondition:index' %}">TrailKondico</a>
+                    </div>
+            </div>
+                <div class="navitemcontainer">
+                    <div class="navitem">
+                        <a href="{% url 'trailcondition:about' %}">About</a>
+                    </div>
+                    <div class="navitem">
+                       <a href="{% url 'trailcondition:trainer' %}">Trainer</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="contentcontainer"> <!-- new -->
+            <div class="innerwrapperresultmap media_result_cc">
+                <div class="innernavcontainerresult">
+                    <div class="button_center_result">
+                            <a class="selectbutton" href="{% url 'trailcondition:index' %}">back</a>
+                        </div>
+                </div>
+                <div class="innercontentcontainerresult media_flex_colrow">
+                    <div class="contentleftresult media_width2_left">
+                            <div id="resultmap" class="media_rmap_height"></div>
+                    </div>
+                    <div class="contentrightresult media_width2_right">
+                        <div id="inputboxresult" class="textcenter">
+                                    <form id="myform" name="myform">
+                                        {% csrf_token %}
+                                        <input type="text" name="lat" id="lat" value={{ lat }}>
+                                        <input type="text" name="lon" id="lng" value={{ lng }}>
+                                    </form>
+                                </div>
+                        <div class="box3">
+                            <span><h4>Selected Location:</h4>{{ lat }}, {{ lng }}</span>
+                        </div>
+                        <div class="box3">
+                            <span><h4>Selected Surface:</h4>{{ stype }}</span>
+                        </div>
+                        <div class="box4">
+                            <h4>Probable Condition of Surface</h4>
+                            <div class="result_surface_box">
+                                <div class="minibox">
+                                    <img class="result_surface_icon" src="/static/trailcondition/images/icon_road.png"></img>
+                                    <h5>Road</h5>
+                                    <span class="result_text">{{ cos_road }}</span>
+                                </div>
+                                <div class="minibox">
+                                    <img class="result_surface_icon" src="/static/trailcondition/images/icon_gravel.png"></img>
+                                    <h5>Gravel</h5>
+                                    <span class="result_text">{{ cos_gravel }}</span>
+                                </div>
+                                <div class="minibox">
+                                    <img class="result_surface_icon" src="/static/trailcondition/images/icon_trail.png"></img>
+                                    <h5>Trail</h5>
+                                    <span class="result_text">{{ cos_trail }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% if rain_status == "1" %}
+                        <div class="box3">
+                            <div class="resultbox media_flex_colrow">
+                                <div class="minibox">
+                                    <h5>Time since last rain:</h5>
+                                    <span class="result_text">{{ time_since_rain_days }} days, {{ time_since_rain_hours }} hours</span>
+                                </div>
+<!--                                {% if lastrain_duration_h == "1" %}
+                                <div class="minibox">
+                                    <h5> Duration of last rain:</h5>
+                                    <span class="result_text"><{{ lastrain_duration_h }} hour</span>
+                                </div>
+                                {% else %}
+                                <div class="minibox">
+                                    <h5> Duration of last rain:</h5>
+                                    <span class="result_text">{{ lastrain_duration_h }} hours</span>
+                                </div>
+                                {% endif %}-->
+                                <div class="minibox">
+                                    <h5>Intensity of last rain:</h5>
+                                    <span class="result_text">{{ lastrain_intensity_mm }} l/m^2</span>
+                                </div>
+
+                                <div class="minibox">
+                                    <!-- <img class="large_icon" src="/static/trailcondition/images/icon_rain_large.png"></img> -->
+                                    <h5> Amount of rain (last five days):</h5>
+                                    <span class="result_text">{{ rain_commulated_l5days_mm }} l/m^2</span>
+                                </div>
+                                {% elif rain_status == "50" %}
+                                <div class="minibox">
+                            <!-- <img class="large_icon" src="/static/trailcondition/images/icon_rain_large.png"></img> -->
+                            <h5> Amount of rain (last 5 days): </h5>
+                            <span class="result_text">{{ rain_commulated_l5days_mm }} mm</span>
+                                       </div>
+                            </div>
+                        </div>
+                        {% elif rain_status == "0" %}
+                        <div class="resultbox media_flex_colrow">
+                                <div class="minibox">
+                            <!-- <img class="large_icon" src="/static/trailcondition/images/icon_sun_large.png"></img> -->
+                            <h4>There was no rain in the past five days.</h4>
+                            <span class="result_text">Enjoy the great outdoors.</span>
+
+                        </div>
+                            </div>
+                        {% else %}
+                        <div class="resultbox media_flex_colrow">
+                            <div class="minibox">
+                                <span class="result_text">Ups, something went wrong. Please try again</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+
+                                              <div class="footer">
+                    <p>Copyright (c) 2018 Copyright Holder All Rights Reserved.</p>
+                      <p>Crafted with love in Munich. Europe. Earth.</p>
+                      <div class="footerbox"></div>
+                  </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="{% static 'trailcondition/leaflet/leaflet.js' %}"></script>
+<script type="text/javascript" src="{% static 'trailcondition/js/jquery-3.3.1.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'trailcondition/js/jquery-ui.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'trailcondition/js/stamen.js' %}"></script>
+<script>
+  var map;
+
+  function initmap(defaultlat, defaultlong){
+
+    var lat = document.getElementById('lat').value;
+    var lng = document.getElementById('lng').value;
+
+	map = L.map('resultmap', {center: [lat, lng], zoom: 13, zoomControl: false});
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+        map.dragging.disable();
+    map.touchZoom.disable();
+    map.doubleClickZoom.disable();
+    map.scrollWheelZoom.disable();
+    L.marker([lat, lng]).addTo(map);
+
+
+
+  }
+
+  // check/set ga cookie
+  function checkforcookie(name) {
+    var status = false;
+    var cookie = name + "=";
+    var allcookies = document.cookie.split(';');
+      for(var i=0; i<allcookies.length; i++)
+      {
+        var c = allcookies[i].trim();
+        if (c.indexOf(cookie)==0)
+        {
+          status = true;
+        }
+      }
+      return status;
+    }
+
+  function clearCookie(name, domain, path){
+	try {
+    if (checkforcookie(name) == true)
+    {
+      document.cookie = name + "=; domain=" + domain + "; path=" + path + ";expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+    }
+	}
+	catch(err) {
+    alert('Fehler: Bitte die Cookies manuell über das Menu deines Webbrowsers löschen.');
+  }
+}
+
+  function cookieconsent() {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-150914856-1');
+    gtag('config', 'UA-150914856-1', { 'anonymize_ip': true });
+    ga('set', 'anonymizeIp', true);
+  }
+
+  function cookierevoke () {
+    window['ga-disable-UA-150914856-1'] = true;
+    clearCookie('_ga','.hellomalte.com','/');
+    clearCookie('_gat_gtag_UA_150914856_1','.hellomalte.com','/');
+    clearCookie('_gid','.hellomalte.com','/');
+  }
+
+  // create consent cookie
+  // Expire date one year
+  function setConsentCookie(value) {
+    var name = "cc_status";
+    var domain = "localhost";
+    var path = "/trailcondition/";
+    var days = 360;
+    var d = new Date;
+    d.setTime(d.getTime() + 24*60*60*1000*days);
+    document.cookie = name + "=" + value + "; domain=" + domain + "; path=" + path + "; expires=" + d.toGMTString() + ";";
+}
+
+  function iwantcookies() {
+    setConsentCookie("allow");
+    cookieconsent();
+    document.getElementById('cookiebanner').style.visibility = 'hidden';
+  }
+
+  // set consent cookie to deny
+  // delete GA cookies
+  // hide cookie bar
+  function dislikecookies() {
+    setConsentCookie("deny");
+    cookierevoke();
+    document.getElementById('cookiebanner').style.visibility = 'hidden';
+  }
+
+  // check for consent cookie
+  function onInit() {
+    if (checkforcookie("cc_status") == false)
+    {
+      document.getElementById('cookiebanner').style.visibility = 'visible';
+    }
+  }
+
+  function reconsider() {
+    if (checkforcookie("cc_status") == true) {
+      dislikecookies();
+    }
+  }
+
+
+onInit();
+initmap();
+
+</script>
+</html>

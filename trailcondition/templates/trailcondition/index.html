@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	  <link rel="stylesheet" type="text/css" href="{% static 'trailcondition/css/jquery-ui.css' %}"/>
+	  <link rel="stylesheet" type="text/css" href="{% static 'trailcondition/css/style.css' %}" />
+	  <link rel="stylesheet" type="text/css" href="{% static 'trailcondition/leaflet/leaflet.css' %}"/>
+    <title>Trail Kondico</title>
+</head>
+<body>
+<div id="cookiebanner">
+  <div class="cookiecontent">
+    <div class="cookietext">
+      <span>By accepting the cookie policy you agree to the useage of cookies on this website. This website uses Google Analytics.</span>
+      <a href="/about/#cookiepolicy">more information</a>
+    </div>
+    <div class="cookiebuttons">
+      <div class="btnlink">
+        <a onclick="dislikecookies()">decline</a>
+      </div>
+      <button onclick="iwantcookies()" class="btncookie">accept</button>
+    </div>
+  </div>
+</div>
+<div id="spinner" class="spinner_hidden">
+      <div class="spinner_anim">
+          <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+      </div>
+      <div class="spinner_text">
+        <span class="result_text">Fetching Weather Data.</span>
+      </div>
+</div>
+<div class="maincontainer media_scroll">
+<div class="container1 media_height1" id="postop">
+    <div id="nav">
+        <div class="navcontainer">
+        <div class="logocontainer">
+                <div class="logo_img media_vis"></div>
+                <div class="logo_center">
+                    <a class="logo_text" href="{% url 'trailcondition:index' %}">TrailKondico</a>
+                </div>
+        </div>
+            <div class="navitemcontainer">
+                <div class="navitem">
+                    <a href="{% url 'trailcondition:about' %}">About</a>
+                </div>
+                <div class="navitem">
+                   <a href="{% url 'trailcondition:trainer' %}">Trainer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="contentcontainer c1">
+        <div class="innerwrappermain media_flex_colrow">
+            <div class="contentleft" id="backimage">
+                <div class="text_center media_text1_hl">
+                    <p><span>Check if your next trail adventure will be dusty, muddy or something in between.
+                  </span></p>
+                </div>
+            </div>
+            <div class="contentright">
+                <div class="boxhigh">
+                    <div class="text_boxhigh">
+                        <p><span>You are planning your next bike ride or hiking trip and want to know if you need to prepare for muddy trails, dust or perfect shredding conditions? Choose the location for your next tour and get a prediction based on historic weather data of the trail surface condition.
+                        .</span></p>
+                    </div>
+                    <div class="button_boxhigh media_flex_colrow">
+                        <a class="selectbutton media_width1" href="#posmap">Choose on Map</a>
+                        <a id="gpxbutton" class="selectbutton_temp media_width1" title="coming soon">upload Tour (GPX)</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+<div class="container2 media_height1" id="posmap">
+    <div class="contentcontainer c2"> <!-- new -->
+        <div class="innerwrappermainmap">
+            <div class="innernavcontainer">
+                <div class="media_vis locationinfocontainer" id="lic">
+                <h3>Selected Location:</h3>
+                <div id="inputbox">
+                    <form id="myform" name="myform" action="{% url 'trailcondition:result' %}" method="post">
+                    {% csrf_token %}
+                        <input type="text" name="lat" id="lat">
+                        <input type="text" name="lon" id="lng">
+                        <div class="hiddenform">
+                        <input type="text" name="type" id="type">
+                            </div>
+                    </form>
+                </div>
+            </div>
+                <div class="button_center_result media_vis">
+                    <a id="exitmap" class="selectbutton" href="#postop">back</a>
+                </div>
+            </div>
+            <div class="innercontentcontainermain">
+
+                <div id="map">
+                                    <div id="location">
+                    <a class="location-link" id="locateuser" title="current location"><img class="icon_arrow" src="/static/trailcondition/images/icon_arrow.png" width="15px" height="15px"></img></a>
+                </div>
+                </div>
+                <div id="main"></div>
+            </div>
+                    <div class="footer">
+      <p>Copyright (c) 2018 Copyright Holder All Rights Reserved.</p>
+        <p>Crafted with love in Munich. Europe. Earth.</p>
+    </div>
+        </div>
+
+    </div>
+
+
+
+        <!--<div class="info">
+          <div class="info_col1">
+              <div class="col_content">
+                  <h2>About</h2>
+                  <div class="headliner_decoration"></div>
+                  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+              </div>
+&lt;!&ndash;            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>&ndash;&gt;
+          </div>
+          <div class="info_col2">
+              <div class="col_content">
+                  <div class="credit_flex">
+                    <h2>Credits</h2>
+                    <div class="headliner_decoration"></div>
+                    <div class="credit_row">
+                      <h3>Weather Data</h3>
+                      <span>Using the awesome <a href="https://openweathermap.org/" target="_blank">Open Weather Map</a> API.</span>
+                    </div>
+                    <div class="credit_row">
+                      <h3>Map Data</h3>
+                      <span>Provided by <a href="https://www.openstreetmap.org/about" target="_blank">Open Street Map</a> with <a href="https://leafletjs.com/" target="_blank">Leaflet</a>. </span>
+                    </div>
+                    <div class="credit_row">
+                      <h3>Cover Photo</h3>
+                            <div class="imagecredits">
+                              <p> Photo by <a id="unsplash_link" target="_blank" href=""></a> on <a target="_blank" href="https://www.unsplash.com/">unsplash</a></p>
+                            </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <div class="info_col3">
+          <div class="col_content">
+            <h2>Share</h2>
+            <div class="headliner_decoration"></div>
+            <span><a href="mailto:?subject=Check out Trail Kondico&body=Hi, if we are planing our next adventure, let's check the trial condition with Trail Kondico first.">Tell a friend</a> by mail.</span>
+          </div>
+        </div>
+    </div>
+  </div>-->
+</div>
+</div>
+</body>
+<script type="text/javascript" src="{% static 'trailcondition/leaflet/leaflet.js' %}"></script>
+<script type="text/javascript" src="{% static 'trailcondition/js/jquery-3.3.1.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'trailcondition/js/jquery-ui.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'trailcondition/js/stamen.js' %}"></script>
+<script type="text/javascript" src="{% static 'trailcondition/js/leafletembedded.js' %}"></script>
+<script type="text/javascript" src="{% static 'trailcondition/js/randomheaderimage.js' %}"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-150914856-1"></script>
+<script type="text/javascript">
+        	function initial() {
+                // let myElement = document.querySelector("#spinner");
+                //    myElement.style.opacity = 0;
+                //    myElement.style.visibility = "hidden";
+
+                var myElement = document.getElementById("spinner");
+                myElement.classList.remove("spinner_loading");
+                myElement.classList.add("spinner_hidden");
+            }
+
+          function unsplash() {
+            var filename_raw = $('cover').css('background-image');
+            var filename_split = filename_raw.split('/');
+            var filename = filename_split[filename_split.length - 1];
+            var authorname = filename.split('-');
+            var given_name = authorname[0];
+            var name = authorname[1];
+            var username_raw = authorname[2].split('.');
+            var username = username_raw[0];
+
+            document.getElementById('unsplash_link').innerHTML += '' + given_name + ' ' + name;
+            document.getElementById('unsplash_link').href = 'https://www.unsplash.com/' + username;
+          }
+
+
+          $("#exitmap").click(function() {
+            map.scrollWheelZoom.disable();
+            map.closePopup();
+          });
+
+          initmap();
+
+          onInit();
+
+          initial();
+
+
+          // activate scroll with mouse wheel on click on map
+        	map.on('click', onMapClick);
+
+
+          // locate user
+          //document.getElementById("location").onclick = function () { locate_user(); };
+
+        	function submitform() {
+
+                var myElement = document.getElementById("spinner");
+                if (myElement.classList.contains('spinner_hidden') == true) {
+                myElement.classList.remove("spinner_hidden");
+                myElement.classList.add("spinner_loading");
+                } else {
+                myElement.classList.remove("spinner_loading");
+                myElement.classList.add("spinner_hidden");
+                }
+
+        	    // var myElement = document.querySelector(".spinner_hidden");
+                // myElement.style.opacity = 1;
+                // myElement.style.visibility = "visible";
+
+
+
+                document.myform.submit();
+
+            }
+
+
+
+
+  // check/set ga cookie
+  function checkforcookie(name) {
+    var status = false;
+    var cookie = name + "=";
+    var allcookies = document.cookie.split(';');
+      for(var i=0; i<allcookies.length; i++)
+      {
+        var c = allcookies[i].trim();
+        if (c.indexOf(cookie)==0)
+        {
+          status = true;
+        }
+      }
+      return status;
+    }
+
+  function clearCookie(name, domain, path){
+	try {
+    if (checkforcookie(name) == true)
+    {
+      document.cookie = name + "=; domain=" + domain + "; path=" + path + ";expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+    }
+	}
+	catch(err) {
+    alert('Fehler: Bitte die Cookies manuell über das Menu deines Webbrowsers löschen.');
+  }
+}
+
+  function cookieconsent() {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-150914856-1');
+    gtag('config', 'UA-150914856-1', { 'anonymize_ip': true });
+    ga('set', 'anonymizeIp', true);
+  }
+
+  function cookierevoke () {
+    window['ga-disable-UA-150914856-1'] = true;
+    clearCookie('_ga','.hellomalte.com','/');
+    clearCookie('_gat_gtag_UA_150914856_1','.hellomalte.com','/');
+    clearCookie('_gid','.hellomalte.com','/');
+  }
+
+  // create consent cookie
+  // Expire date one year
+  function setConsentCookie(value) {
+    var name = "cc_status";
+    var domain = "localhost";
+    var path = "/trailcondition/";
+    var days = 360;
+    var d = new Date;
+    d.setTime(d.getTime() + 24*60*60*1000*days);
+    document.cookie = name + "=" + value + "; domain=" + domain + "; path=" + path + "; expires=" + d.toGMTString() + ";";
+}
+
+  function iwantcookies() {
+    setConsentCookie("allow");
+    cookieconsent();
+    document.getElementById('cookiebanner').style.visibility = 'hidden';
+  }
+
+  // set consent cookie to deny
+  // delete GA cookies
+  // hide cookie bar
+  function dislikecookies() {
+    setConsentCookie("deny");
+    cookierevoke();
+    document.getElementById('cookiebanner').style.visibility = 'hidden';
+  }
+
+  // check for consent cookie
+  function onInit() {
+    if (checkforcookie("cc_status") == false)
+    {
+      document.getElementById('cookiebanner').style.visibility = 'visible';
+    }
+  }
+
+  function reconsider() {
+    if (checkforcookie("cc_status") == true) {
+      dislikecookies();
+    }
+  }
+
+  // random header images
+  getRandomImage(headerimgarray);
+
+  // unsplash();
+
+
+</script>
+</html>

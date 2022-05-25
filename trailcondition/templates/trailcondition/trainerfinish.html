@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	    <link rel="stylesheet" type="text/css" href="{% static 'trailcondition/css/jquery-ui.css' %}"/>
+	    <link rel="stylesheet" type="text/css" href="{% static 'trailcondition/css/style.css' %}" />
+	    <link rel="stylesheet" type="text/css" href="{% static 'trailcondition/leaflet/leaflet.css' %}"/>
+        <title>Trail Kondico</title>
+    </head>
+
+    <div id="cookiebanner">
+  <div class="cookiecontent">
+    <div class="cookietext">
+      <span>By accepting the cookie policy you agree to the useage of cookies on this website. This website uses Google Analytics.</span>
+      <a href="/about/#cookiepolicy">more information</a>
+    </div>
+    <div class="cookiebuttons">
+      <div class="btnlink">
+        <a onclick="dislikecookies()">decline</a>
+      </div>
+      <button onclick="iwantcookies()" class="btncookie">accept</button>
+    </div>
+  </div>
+</div>
+<div class="maincontainer">
+<div class="container1 media_height1" id="postop">
+    <div id="nav">
+        <div class="navcontainer">
+        <div class="logocontainer">
+                <div class="logo_img"></div>
+                <div class="logo_center">
+                    <a class="logo_text" href="{% url 'trailcondition:index' %}">TrailKondico</a>
+                </div>
+        </div>
+            <div class="navitemcontainer">
+                <div class="navitem">
+                    <a href="{% url 'trailcondition:about' %}">About</a>
+                </div>
+                <div class="navitem">
+                   <a href="{% url 'trailcondition:trainer' %}">Trainer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="contentcontainer page">
+        <div class="box2">
+            <h2>Thank you!</h2>
+            <p>You provided valuable training data for improving the TrailKondico algorithm.</p>
+    </div>
+        <div class="box2">
+                        <div class="button_center_result media_vis">
+                    <a id="exitmap" class="selectbutton" href="#postop">back</a>
+                </div>
+            </div>
+    <div class="footer">
+      <p>Copyright (c) 2018 Copyright Holder All Rights Reserved.</p>
+        <p>Crafted with love in Munich. Europe. Earth.</p>
+      <div class="footerbox"></div>
+    </div>
+</div>
+    </div>
+</body>
+<script type="text/javascript" src="{% static 'trailcondition/js/jquery-3.3.1.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'trailcondition/js/jquery-ui.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'trailcondition/leaflet/leaflet.js' %}"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-150914856-1"></script>
+<script type="text/javascript">
+
+      var map;
+      var defaultlat = 48.6534;
+      var defaultlong = 11.212;
+
+          function userlocation() {
+                function success(position) {
+                         const latitude  = position.coords.latitude;
+                         const longitude = position.coords.longitude;
+
+                         document.getElementById("lat").value = Number(( parseFloat(latitude) ).toFixed(4));
+                        document.getElementById("lng").value = Number(( parseFloat(longitude) ).toFixed(4));
+
+                        map.setView(new L.LatLng(latitude, longitude), 14);
+                        L.marker([latitude, longitude]).addTo(map);
+
+                    alert(latitude);
+                };
+
+                function error(){
+
+                };
+
+                var options = {
+                  enableHighAccuracy: true,
+                  timeout: 5000,
+                  maximumAge: 100
+                };
+
+                //var usrloc = locate_user();
+                navigator.geolocation.getCurrentPosition(success, error, options);
+
+          };
+
+
+        	function submitform() {
+                document.trainerform.submit();
+            }
+
+
+  // check/set ga cookie
+  function checkforcookie(name) {
+    var status = false;
+    var cookie = name + "=";
+    var allcookies = document.cookie.split(';');
+      for(var i=0; i<allcookies.length; i++)
+      {
+        var c = allcookies[i].trim();
+        if (c.indexOf(cookie)==0)
+        {
+          status = true;
+        }
+      }
+      return status;
+    }
+
+  function clearCookie(name, domain, path){
+	try {
+    if (checkforcookie(name) == true)
+    {
+      document.cookie = name + "=; domain=" + domain + "; path=" + path + ";expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+    }
+	}
+	catch(err) {
+    alert('Fehler: Bitte die Cookies manuell über das Menu deines Webbrowsers löschen.');
+  }
+}
+
+  function cookieconsent() {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-150914856-1');
+    gtag('config', 'UA-150914856-1', { 'anonymize_ip': true });
+    ga('set', 'anonymizeIp', true);
+  }
+
+  function cookierevoke () {
+    window['ga-disable-UA-150914856-1'] = true;
+    clearCookie('_ga','.hellomalte.com','/');
+    clearCookie('_gat_gtag_UA_150914856_1','.hellomalte.com','/');
+    clearCookie('_gid','.hellomalte.com','/');
+  }
+
+  // create consent cookie
+  // Expire date one year
+  function setConsentCookie(value) {
+    var name = "cc_status";
+    var domain = "localhost";
+    var path = "/trailcondition/";
+    var days = 360;
+    var d = new Date;
+    d.setTime(d.getTime() + 24*60*60*1000*days);
+    document.cookie = name + "=" + value + "; domain=" + domain + "; path=" + path + "; expires=" + d.toGMTString() + ";";
+}
+
+  function iwantcookies() {
+    setConsentCookie("allow");
+    cookieconsent();
+    document.getElementById('cookiebanner').style.visibility = 'hidden';
+  }
+
+  // set consent cookie to deny
+  // delete GA cookies
+  // hide cookie bar
+  function dislikecookies() {
+    setConsentCookie("deny");
+    cookierevoke();
+    document.getElementById('cookiebanner').style.visibility = 'hidden';
+  }
+
+  // check for consent cookie
+  function onInit() {
+    if (checkforcookie("cc_status") == false)
+    {
+      document.getElementById('cookiebanner').style.visibility = 'visible';
+    }
+  }
+
+  function reconsider() {
+    if (checkforcookie("cc_status") == true) {
+      dislikecookies();
+    }
+  }
+
+
+</script>
+
+</html>

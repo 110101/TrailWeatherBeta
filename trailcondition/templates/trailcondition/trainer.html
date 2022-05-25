@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	  <link rel="stylesheet" type="text/css" href="{% static 'trailcondition/css/jquery-ui.css' %}"/>
+	  <link rel="stylesheet" type="text/css" href="{% static 'trailcondition/css/style.css' %}" />
+	  <link rel="stylesheet" type="text/css" href="{% static 'trailcondition/leaflet/leaflet.css' %}"/>
+    <title>Trail Kondico - Trainer</title>
+</head>
+<body>
+<div id="cookiebanner">
+  <div class="cookiecontent">
+    <div class="cookietext">
+      <span>By accepting the cookie policy you agree to the useage of cookies on this website. This website uses Google Analytics.</span>
+      <a href="/about/#cookiepolicy">more information</a>
+    </div>
+    <div class="cookiebuttons">
+      <div class="btnlink">
+        <a onclick="dislikecookies()">decline</a>
+      </div>
+      <button onclick="iwantcookies()" class="btncookie">accept</button>
+    </div>
+  </div>
+</div>
+<div class="maincontainer">
+<div class="container1 media_height1" id="postop">
+    <div id="nav">
+        <div class="navcontainer">
+        <div class="logocontainer">
+                <div class="logo_img"></div>
+                <div class="logo_center">
+                    <a class="logo_text" href="{% url 'trailcondition:index' %}">TrailKondico</a>
+                </div>
+        </div>
+            <div class="navitemcontainer">
+                <div class="navitem">
+                    <a href="{% url 'trailcondition:about' %}">About</a>
+                </div>
+                <div class="navitem">
+                   <a href="{% url 'trailcondition:trainer' %}">Trainer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="contentcontainer page">
+        <div class="box2">
+            <div class="trainerbox">
+                <a class="selectbuttontrainer" onclick="locate_user()" href="#">Get Current Location</a>
+            </div>
+            <div class="trainerbox">
+                <div id="trainermap"></div>
+            </div>
+            <div class="trainerbox">
+                <form id="trainerform" name="trainerform" action="{% url 'trailcondition:trainerfinish' %}" method="post">
+                    {% csrf_token %}
+                    <label for="surface">Select surface type:</label>
+                    <select id="surface" name="surface" class="trainerdropdown">
+                        <option value="paved">paved</option>
+                        <option value="asphalt">asphalt</option>
+                        <option value="concrete">concrete</option>
+                        <option value="paving_stones">paving stones</option>
+                        <option value="cobblestones">cobblestones</option>
+                        <option value="metal">metal</option>
+                        <option value="wood">wood</option>
+                        <option value="unpaved">unpaved</option>
+                        <option value="compacted">compacted</option>
+                        <option value="fine_gravel">fine gravel</option>
+                        <option value="gravel">gravel</option>
+                        <option value="pebblestone">pebblestone</option>
+                        <option value="ground">ground</option>
+                        <option value="dirt">dirt</option>
+                        <option value="sand">sand</option>
+                        <option value="grass">grass</option>
+                        <option value="woodchips">woodchips</option>
+                    </select>
+                    <label for="condition">Select surface condition:</label>
+                    <select id="condition" name="condition" class="trainerdropdown">
+                        <option value="dry">dry</option>
+                        <option value="dry_wet">partly dry/wet (e.g puddles)</option>
+                        <option value="wet">wet </option>
+                        <option value="muddy">muddy</option>
+                    </select>
+                    <div id="lic">
+                        <input type="text" id="lat" name="lat">
+                        <input type="text" id="lng" name="lng">
+                    </div>
+                </form>
+            </div>
+        <div class="trainerbox">
+            <a class="selectbuttontrainer" rel="import" href="javascript: submitform()">Submit</a>
+        </div>
+        </div>
+    </div>
+    <div class="footer">
+      <p>Copyright (c) 2018 Copyright Holder All Rights Reserved.</p>
+        <p>Crafted with love in Munich. Europe. Earth.</p>
+      <div class="footerbox"></div>
+    </div>
+</div>
+    </div>
+</body>
+<script type="text/javascript" src="{% static 'trailcondition/js/jquery-3.3.1.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'trailcondition/js/jquery-ui.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'trailcondition/leaflet/leaflet.js' %}"></script>
+<script type="text/javascript" src="{% static 'trailcondition/js/leafletembedded.js' %}"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-150914856-1"></script>
+<script type="text/javascript">
+
+            initmapTrainer();
+
+            // activate scroll with mouse wheel on click on map
+        	map.on('click', onMapClickTrainer);
+
+        	function submitform() {
+                document.trainerform.submit();
+
+            }
+
+
+  // check/set ga cookie
+  function checkforcookie(name) {
+    var status = false;
+    var cookie = name + "=";
+    var allcookies = document.cookie.split(';');
+      for(var i=0; i<allcookies.length; i++)
+      {
+        var c = allcookies[i].trim();
+        if (c.indexOf(cookie)==0)
+        {
+          status = true;
+        }
+      }
+      return status;
+    }
+
+  function clearCookie(name, domain, path){
+	try {
+    if (checkforcookie(name) == true)
+    {
+      document.cookie = name + "=; domain=" + domain + "; path=" + path + ";expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+    }
+	}
+	catch(err) {
+    alert('Fehler: Bitte die Cookies manuell über das Menu deines Webbrowsers löschen.');
+  }
+}
+
+  function cookieconsent() {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-150914856-1');
+    gtag('config', 'UA-150914856-1', { 'anonymize_ip': true });
+    ga('set', 'anonymizeIp', true);
+  }
+
+  function cookierevoke () {
+    window['ga-disable-UA-150914856-1'] = true;
+    clearCookie('_ga','.hellomalte.com','/');
+    clearCookie('_gat_gtag_UA_150914856_1','.hellomalte.com','/');
+    clearCookie('_gid','.hellomalte.com','/');
+  }
+
+  // create consent cookie
+  // Expire date one year
+  function setConsentCookie(value) {
+    var name = "cc_status";
+    var domain = "localhost";
+    var path = "/trailcondition/";
+    var days = 360;
+    var d = new Date;
+    d.setTime(d.getTime() + 24*60*60*1000*days);
+    document.cookie = name + "=" + value + "; domain=" + domain + "; path=" + path + "; expires=" + d.toGMTString() + ";";
+}
+
+  function iwantcookies() {
+    setConsentCookie("allow");
+    cookieconsent();
+    document.getElementById('cookiebanner').style.visibility = 'hidden';
+  }
+
+  // set consent cookie to deny
+  // delete GA cookies
+  // hide cookie bar
+  function dislikecookies() {
+    setConsentCookie("deny");
+    cookierevoke();
+    document.getElementById('cookiebanner').style.visibility = 'hidden';
+  }
+
+  // check for consent cookie
+  function onInit() {
+    if (checkforcookie("cc_status") == false)
+    {
+      document.getElementById('cookiebanner').style.visibility = 'visible';
+    }
+  }
+
+  function reconsider() {
+    if (checkforcookie("cc_status") == true) {
+      dislikecookies();
+    }
+  }
+
+
+</script>
+</html>
